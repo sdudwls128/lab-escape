@@ -75,8 +75,8 @@ public:
 	void setFrontScene();
 	void setExitScene();
 	void setLeftScene();
-	void setRightScene();
 	void setMiddleScene();
+	void setRightScene();
 	void setComputerScene();
 	void setDrawerScene();
 };

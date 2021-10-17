@@ -6,11 +6,10 @@ Lab::Lab() {
 	setFrontScene();
 	setExitScene();
 	setLeftScene();
+	setMiddleScene();
 	setRightScene();
 	setComputerScene();
 	setDrawerScene();
-	setMiddleScene();
-
 }
 
 /** lab.h를 참조하는 다른 소스코드에서 게임을 시작할 수 있도록 함 **/
@@ -18,7 +17,6 @@ void Lab::labStart() {
 	setGameOption(GameOption::GAME_OPTION_INVENTORY_BUTTON, true);
 	aisleScene->enter();
 }
-
 
 void Lab::setAisleScene() {
 	aisleScene = Scene::create("", "Images/aisle.png");
@@ -30,7 +28,7 @@ void Lab::setAisleScene() {
 	});
 }
 
-
+/** set the door scene **/
 void Lab::setDoorScene(){
 	doorInIsOpen = 0;
 	doorScene = Scene::create("", "Images/door-background.png");
@@ -40,13 +38,12 @@ void Lab::setDoorScene(){
 			doorIn->setImage("Images/door-caution-open.png");
 			doorInIsOpen = 1;
 		}
-		else if (doorInIsOpen == 1) 
-			frontScene->enter();
+		else  frontScene->enter();
 		return true;
 	});
 }
 
-
+/** set the front scene **/
 void Lab::setFrontScene() {
 	frontScene = Scene::create("", "Images/Front/lab-front.png");
 	frontBack = Object::create("Images/back.png", frontScene, 600, 50);
@@ -57,13 +54,13 @@ void Lab::setFrontScene() {
 
 	int x[6] = { 235, 333, 350, 425, 240, 325 };
 	int y[6] = { 425, 425, 345, 345, 280, 225 };
-
 	for (int i = 0; i < 6; i++) {
 		sprintf_s(path, "Images/Left/prop%d.png", i + 1);
 		frontProps[i] = Object::create(path, frontScene, x[i], y[i]);
 		frontProps[i]->setScale(0.5);
 	}
 
+	// 장면 이동 동작 설정
 	frontBack->setOnMouseCallback([&](auto obj, auto x, auto y, auto action)->bool {
 		exitScene->enter();
 		return true;
@@ -82,37 +79,36 @@ void Lab::setFrontScene() {
 	});
 }
 
-
+/** set the exit scene **/
 void Lab::setExitScene() {
 	exitScene = Scene::create("", "Images/Front/lab-front.png");
 	exitBack = Object::create("Images/back.png", exitScene, 600, 50);
 	exitDoor = Object::create("Images/door-close.png", exitScene, 400, 220);
 	exitDoor->setScale(0.45);
 	
-	exitBack->setOnMouseCallback([&](auto obj, auto x, auto y, auto action)->bool {
-		frontScene->enter();
-		return true;
-	});
-
+	// 탈출할 수 있는지 확인하는 동작
 	exitDoor->setOnMouseCallback([&](auto obj, auto x, auto y, auto action)->bool {
 		if (isComplete == 0) 
 			showMessage("코드를 풀지 못했습니다.\n정확한 코드를 입력하기 전까지 문을 열 수 없습니다.");
-		else if (isComplete == 1) {
+		else {
 			if (exitDoorIsOpen == 0) {
 				exitDoor->setImage("Images/door-open.png");
 				exitDoorIsOpen = 1;
 				showMessage("축하합니다. 탈출에 성공했습니다!");
 			}
-			else if (exitDoorIsOpen == 1) {
-				endGame();
-			}
+			else endGame();
 		}
-
+		return true;
+	});	
+	
+	// 이전 장면으로 돌아가는 동작 설정
+	exitBack->setOnMouseCallback([&](auto obj, auto x, auto y, auto action)->bool {
+		frontScene->enter();
 		return true;
 	});
 }
 
-
+/** set the left scene **/
 void Lab::setLeftScene() {
 	leftScene = Scene::create("", "Images/Left/lab-left.png");
 	leftBack = Object::create("Images/back.png", leftScene, 600, 50);
@@ -171,7 +167,17 @@ void Lab::setLeftScene() {
 	});
 }
 
+/** set the middle scene **/
+void Lab::setMiddleScene() {
+	middleScene = Scene::create("", "Images/Middle/lab-middle.png");
+	middleBack = Object::create("Images/back.png", middleScene, 600, 50);
+	middleBack->setOnMouseCallback([&](auto obj, auto x, auto y, auto action)->bool {
+		frontScene->enter();
+		return true;
+	});
+}
 
+/** set the right scene **/
 void Lab::setRightScene() {
 	// 필요한 Scene과 Object 설정
 	rightScene = Scene::create("", "Images/Right/lab-right.png");
@@ -450,6 +456,8 @@ void Lab::setComputerScene() {
 
 	// 코드를 입력하고 맞는지 확인하는 동작
 	enter->setOnMouseCallback([&](auto obj, auto x, auto y, auto action)->bool {
+		for (int i = 0; i < 4; i++)
+			printf_s("%d  ", input[i]);
 		if (input[0] == 3 && input[1] == 10 && input[2] == 7 && input[3] == 24) {
 			showMessage("코드가 입력되었습니다. 로봇이 모두 중단됩니다.\n이제 밖으로 나갈 수 있습니다.");
 			isComplete = 1;
@@ -474,7 +482,6 @@ void Lab::setComputerScene() {
 
 /** Set the drawer scene **/
 void Lab::setDrawerScene() {
-	// DrawerScene과 이전 장면으로 들어갈 때 쓰이는 Object 설정
 	drawerScene = Scene::create("", "Images/Right/drawer-background.png");
 	drawerBack = Object::create("Images/back.png", drawerScene, 600, 50);
 
@@ -664,16 +671,6 @@ void Lab::setDrawerScene() {
 	// 이전 장면으로 돌아가는 동작 설정
 	drawerBack->setOnMouseCallback([&](auto obj, auto x, auto y, auto action)->bool {
 		rightScene->enter();
-		return true;
-	});
-}
-
-
-void Lab::setMiddleScene() {
-	middleScene = Scene::create("", "Images/Middle/lab-middle.png");
-	middleBack = Object::create("Images/back.png", middleScene, 600, 50);
-	middleBack->setOnMouseCallback([&](auto obj, auto x, auto y, auto action)->bool {
-		frontScene->enter();
 		return true;
 	});
 }
