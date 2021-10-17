@@ -38,6 +38,7 @@ class Lab {
 	ObjectPtr leftBack;
 	ObjectPtr leftBookshelf;
 	ObjectPtr leftProps[6];
+	ObjectPtr key;
 	
 	//Middle
 	ScenePtr middleScene;
@@ -58,7 +59,11 @@ class Lab {
 	ScenePtr drawerScene;
 	ObjectPtr drawerBack;
 	ObjectPtr drawers[3];
+	ObjectPtr drawer2Lock[12];
+	ObjectPtr drawer3Lock[6];
+	ObjectPtr box;
 	ObjectPtr hints[3];
+	int boxIsOpen;
 	int drawerIsSolve[3];
 	int drawerIsOpen[3];
 

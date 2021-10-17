@@ -50,7 +50,7 @@ void Lab::setDoorScene(){
 void Lab::setFrontScene() {
 	frontScene = Scene::create("", "Images/Front/lab-front.png");
 	frontBack = Object::create("Images/back.png", frontScene, 600, 50);
-	frontLeft = Object::create("Images/Left/bookshelf-hint.png", frontScene, 220, 200);
+	frontLeft = Object::create("Images/Left/bookshelf.png", frontScene, 220, 200);
 	frontLeft->setScale(0.5);
 	frontMiddle = Object::create("Images/Middle/clock.png", frontScene, 640, 460);
 	frontRight = Object::create("Images/Right/desk-set.png", frontScene, 780, 155);
@@ -116,7 +116,9 @@ void Lab::setExitScene() {
 void Lab::setLeftScene() {
 	leftScene = Scene::create("", "Images/Left/lab-left.png");
 	leftBack = Object::create("Images/back.png", leftScene, 600, 50);
-	leftBookshelf = Object::create("Images/Left/bookshelf-hint.png", leftScene, 101, 80);
+	leftBookshelf = Object::create("Images/Left/bookshelf.png", leftScene, 101, 80);
+	key = Object::create("Images/Left/key.png", leftScene, 560, 372);
+	key->setScale(0.15);
 
 	int originX[6] = { 123, 325, 355, 507, 136, 310 };
 	int originY[6] = { 525, 525, 372, 372, 230, 115 };
@@ -132,6 +134,10 @@ void Lab::setLeftScene() {
 		});
 	}
 
+	key->setOnMouseCallback([&](auto obj, auto x, auto y, auto action)->bool {
+		obj->pick();
+		return true;
+	});
 	leftBack->setOnMouseCallback([&](auto obj, auto x, auto y, auto action)->bool {
 		frontScene->enter();
 		return true;
@@ -175,12 +181,18 @@ void Lab::setComputerScene() {
 void Lab::setDrawerScene() {
 	drawerScene = Scene::create("", "Images/Right/drawer-background.png");
 	drawerBack = Object::create("Images/back.png", drawerScene, 600, 50);
-	
+
+	boxIsOpen = 0;
+	for (int i = 0; i < 3; i++) {
+		drawerIsOpen[i] = 0;
+		drawerIsSolve[i] = 0;
+	}
+
 	for (int i = 2; i > -1; i--) {
 		sprintf_s(path, "Images/Right/drawer%d-close.png", i + 1);
 		drawers[i] = Object::create(path, drawerScene, 453, 550 - i * 138);
 		sprintf_s(path, "Images/Right/hint%d.png", i + 1);
-		hints[i] = Object::create(path, drawerScene, 475, 460 - i * 100);
+		hints[i] = Object::create(path, drawerScene, 475, 460 - i * 110);
 		hints[i]->setScale(0.15);
 		hints[i]->hide();
 
@@ -196,6 +208,9 @@ void Lab::setDrawerScene() {
 		});
 	}
 
+	box = Object::create("Images/Right/box-close.png", drawerScene, 470, 200, false);
+	box->setScale(0.15);
+	
 	drawers[0]->setOnMouseCallback([&](auto obj, auto x, auto y, auto action)->bool {
 		if (drawerIsOpen[0] == 0) {
 			obj->setImage("Images/Right/drawer1-open.png");
@@ -214,13 +229,13 @@ void Lab::setDrawerScene() {
 	
 	drawers[1]->setOnMouseCallback([&](auto obj, auto x, auto y, auto action)->bool {
 		if (drawerIsOpen[1] == 0) {
-			obj->setImage("Images/Right/drawer2-solve-open.png");
-			obj->locate(drawerScene, 360, 140);
+			obj->setImage("Images/Right/drawer2-open.png");
+			obj->locate(drawerScene, 360, 150);
 			drawerIsOpen[1] = 1;
 			hints[1]->show();
 		}
 		else {
-			obj->setImage("Images/Right/drawer2-solve-close.png");
+			obj->setImage("Images/Right/drawer2-close.png");
 			obj->locate(drawerScene, 453, 412);
 			drawerIsOpen[1] = 0;
 			hints[1]->hide();
@@ -231,19 +246,39 @@ void Lab::setDrawerScene() {
 	drawers[2]->setOnMouseCallback([&](auto obj, auto x, auto y, auto action)->bool {
 		if (drawerIsOpen[2] == 0) {
 			obj->setImage("Images/Right/drawer3-open.png");
-			obj->locate(drawerScene, 370, 70);
+			obj->locate(drawerScene, 365, 15);
 			drawerIsOpen[2] = 1;
-			hints[2]->show();
+			box->show();
+			if (boxIsOpen == 1)
+				hints[2]->show();
 		}
 		else {
 			obj->setImage("Images/Right/drawer3-close.png");
-			obj->locate(drawerScene, 453, 274);
+			obj->locate(drawerScene, 455, 280);
 			drawerIsOpen[2] = 0;
-			hints[2]->hide();
+			box->hide();
+			if (boxIsOpen == 1)
+				hints[2]->hide();
 		}
 		return true;
-		});
+	});
 
+	box->setOnMouseCallback([&](auto obj, auto x, auto y, auto action)->bool {
+		if (boxIsOpen == 0) {
+			if (key->isHanded()) {
+				box->setImage("Images/Right/box-open.png");
+				box->setScale(0.18);
+				box->locate(drawerScene, 470, 185);
+				boxIsOpen = 1;
+				hints[2]->locate(drawerScene, 510, 320);
+				hints[2]->show();
+			}
+			else {
+				showMessage("상자가 잠겨있네. 열쇠가 필요하겠군!");
+			}
+		}
+		return true;
+	});
 	drawerBack->setOnMouseCallback([&](auto obj, auto x, auto y, auto action)->bool {
 		rightScene->enter();
 		return true;
