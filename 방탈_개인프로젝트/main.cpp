@@ -2,6 +2,6 @@
 
 int main()
 {
-    Escape escape;
-    escape.gameStart();
+    Escape game;
+    game.gameStart();
 }

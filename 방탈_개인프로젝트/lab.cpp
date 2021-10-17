@@ -38,13 +38,23 @@ void Lab::setDoorScene(){
 			doorIn->setImage("Images/door-caution-open.png");
 			doorInIsOpen = 1;
 		}
-		else  frontScene->enter();
+		else {
+			frontScene->enter();
+			showTimer(timer);
+			timer->start();
+		}
 		return true;
 	});
 }
 
 /** set the front scene **/
 void Lab::setFrontScene() {
+	timer = Timer::create(180.f);
+	timer->setOnTimerCallback([&](TimerPtr)->bool {
+		showMessage("타임 오버!!!\n탈출에 실패했습니다.");
+		endGame();
+		return true;
+	});
 	frontScene = Scene::create("", "Images/Front/lab-front.png");
 	frontBack = Object::create("Images/back.png", frontScene, 600, 50);
 	frontLeft = Object::create("Images/Left/bookshelf.png", frontScene, 220, 200);
@@ -94,7 +104,7 @@ void Lab::setExitScene() {
 			if (exitDoorIsOpen == 0) {
 				exitDoor->setImage("Images/door-open.png");
 				exitDoorIsOpen = 1;
-				showMessage("축하합니다. 탈출에 성공했습니다!");
+				showMessage("축하합니다~ 탈출에 성공했습니다!!!");
 			}
 			else endGame();
 		}
@@ -459,6 +469,7 @@ void Lab::setComputerScene() {
 		for (int i = 0; i < 4; i++)
 			printf_s("%d  ", input[i]);
 		if (input[0] == 3 && input[1] == 10 && input[2] == 7 && input[3] == 24) {
+			timer->stop();
 			showMessage("코드가 입력되었습니다. 로봇이 모두 중단됩니다.\n이제 밖으로 나갈 수 있습니다.");
 			isComplete = 1;
 		}
