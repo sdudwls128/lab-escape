@@ -53,19 +53,19 @@ class Lab {
 	//Computer
 	ScenePtr computerScene;
 	ObjectPtr computerBack;
-	
+	ObjectPtr password[4];
+	ObjectPtr keypad[26];
+	ObjectPtr enter;
+	ObjectPtr clear;
+
 
 	//Drawer
 	ScenePtr drawerScene;
 	ObjectPtr drawerBack;
 	ObjectPtr drawers[3];
-	ObjectPtr drawer2Lock[12];
 	ObjectPtr drawer3Lock[6];
 	ObjectPtr box;
 	ObjectPtr hints[3];
-	int boxIsOpen;
-	int drawerIsSolve[3];
-	int drawerIsOpen[3];
 
 public:
 	Lab();

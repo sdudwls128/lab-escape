@@ -2,6 +2,7 @@
 #include "lab.h"
 
 class Escape {
+	ScenePtr startScene;
 	ScenePtr labExplain;
 
 	ObjectPtr labButton;
